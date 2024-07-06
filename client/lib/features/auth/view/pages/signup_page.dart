@@ -1,7 +1,11 @@
 import 'package:client/core/theme/app_pallete.dart';
+import 'package:client/features/auth/repositories/auth_remote_repository.dart';
+import 'package:client/features/auth/view/pages/login_page.dart';
 import 'package:client/features/auth/view/widgets/auth_custom_textfield.dart';
 import 'package:client/features/auth/view/widgets/auth_gradient_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:fpdart/fpdart.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -48,33 +52,56 @@ class _SignUpPageState extends State<SignUpPage> {
               const SizedBox(
                 height: 15,
               ),
-               CustomField(hintText: 'Email', controller: emailController),
+              CustomField(hintText: 'Email', controller: emailController),
               const SizedBox(
                 height: 15,
               ),
-               CustomField(hintText: 'Password', controller: passwordController,isObscure: true,),
+              CustomField(
+                hintText: 'Password',
+                controller: passwordController,
+                isObscure: true,
+              ),
               const SizedBox(
                 height: 15,
               ),
-               AuthGradientButtonn(
+              AuthGradientButtonn(
                 buttonText: 'Sign Up',
-                onPressed: (){},  
+                onPressed: () async {
+                  final res = await AuthRemoteRepository().signup(
+                      name: nameController.text.trim(),
+                      email: emailController.text.trim(),
+                      password: passwordController.text.trim());
+                  final val = switch (res) {
+                    Right(value: final r) => r.toString(),
+                    Left(value: final l) => l.toString()
+                  };
+                  print(val);
+                },
               ),
               const SizedBox(
                 height: 15,
               ),
-              RichText(
-                text: TextSpan(
-                    text: 'Already have an account? ',
-                    style: Theme.of(context).textTheme.titleMedium,
-                    children: <TextSpan>[
-                      TextSpan(
-                        text: 'Sign In',
-                        style: TextStyle(
-                            color: Pallete.gradient2,
-                            fontWeight: FontWeight.bold),
-                      )
-                    ]),
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const LoginPage(),
+                    ),
+                  );
+                },
+                child: RichText(
+                  text: TextSpan(
+                      text: 'Already have an account? ',
+                      style: Theme.of(context).textTheme.titleMedium,
+                      children: const <TextSpan>[
+                        TextSpan(
+                          text: 'Sign In',
+                          style: TextStyle(
+                              color: Pallete.gradient2,
+                              fontWeight: FontWeight.bold),
+                        )
+                      ]),
+                ),
               ),
             ],
           ),
