@@ -33,7 +33,9 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = ref.watch(authViewModelProvider)?.isLoading == true;
+    final isLoading = ref.watch(authViewModelProvider.select((val) {
+      val?.isLoading == true;
+    }));
     ref.listen(authViewModelProvider, (previous, next) {
       next?.when(
           data: (data) {
@@ -42,7 +44,8 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
               MaterialPageRoute(
                 builder: (_) => const LoginPage(),
               ),
-            );},
+            );
+          },
           error: (error, s) {
             showSnackBar(context, error.toString());
           },

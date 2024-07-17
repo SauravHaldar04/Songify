@@ -33,12 +33,19 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = ref.watch(authViewModelProvider)?.isLoading == true;
+    final isLoading = ref.watch(authViewModelProvider.select((value) {
+      value?.isLoading == true;
+    }));
 
     ref.listen(authViewModelProvider, (previous, next) {
       next?.when(
           data: (data) {
-            showSnackBar(context, "User logged in successfully");
+            showSnackBar(context, "User created successfully");
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const LoginPage(),
+              ),
+            );
           },
           error: (error, s) {
             showSnackBar(context, error.toString());
@@ -48,75 +55,74 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(),
-      body:
-      isLoading
+      body: isLoading
           ? const Loader()
-          :
-       Padding(
-        padding: const EdgeInsets.all(15),
-        child: Form(
-          key: formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'Sign In.',
-                style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              CustomField(hintText: 'Email', controller: emailController),
-              const SizedBox(
-                height: 15,
-              ),
-              CustomField(
-                hintText: 'Password',
-                controller: passwordController,
-                isObscure: true,
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              AuthGradientButtonn(
-                buttonText: 'Sign In',
-                onPressed: () async {
-                  if (formKey.currentState!.validate()) {
+          : Padding(
+              padding: const EdgeInsets.all(15),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Sign In.',
+                      style:
+                          TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    CustomField(hintText: 'Email', controller: emailController),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    CustomField(
+                      hintText: 'Password',
+                      controller: passwordController,
+                      isObscure: true,
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    AuthGradientButtonn(
+                      buttonText: 'Sign In',
+                      onPressed: () async {
+                        if (formKey.currentState!.validate()) {
                           await ref.read(authViewModelProvider.notifier).login(
                               email: emailController.text.trim(),
                               password: passwordController.text.trim());
                         }
-                },
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              GestureDetector(
-                onTap: () async {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const SignUpPage(),
+                      },
                     ),
-                  );
-                },
-                child: RichText(
-                  text: TextSpan(
-                      text: 'Don\'t have an account? ',
-                      style: Theme.of(context).textTheme.titleMedium,
-                      children: const <TextSpan>[
-                        TextSpan(
-                          text: 'Sign Up',
-                          style: TextStyle(
-                              color: Pallete.gradient2,
-                              fontWeight: FontWeight.bold),
-                        )
-                      ]),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    GestureDetector(
+                      onTap: () async {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const SignUpPage(),
+                          ),
+                        );
+                      },
+                      child: RichText(
+                        text: TextSpan(
+                            text: 'Don\'t have an account? ',
+                            style: Theme.of(context).textTheme.titleMedium,
+                            children: const <TextSpan>[
+                              TextSpan(
+                                text: 'Sign Up',
+                                style: TextStyle(
+                                    color: Pallete.gradient2,
+                                    fontWeight: FontWeight.bold),
+                              )
+                            ]),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }
